@@ -14,7 +14,7 @@ os: linux
 dist: xenial
 
 before_install:
-  - export FILE_ROOT="install"
+  - export FILE_ROOT="protobufkdb"
   - export TESTS="False"
   - export BUILD="True"
 
@@ -23,13 +23,16 @@ before_install:
   - if [[ $BUILD == "True" ]]; then
       chmod +x travis_setup.sh; 
       ./travis_setup.sh;
-      export BUILD_HOME=$TRAVIS_BUILD_DIR/cbuild/install;
-      # Make sure the protoc binary is on the path so the cmake functionality to locate the protobuf installation works
-      export PATH=$BUILD_HOME/bin:$PATH;
       export LIB="cmake/$FILE_ROOT/lib";
       mkdir cmake;
     else
       export LIB="";
+    fi
+    
+  # On Windows, make sure protoc.exe is on the path so the cmake functionality to locate the protobuf installation works    
+  - if [[ $BUILD == "True" && $TRAVIS_OS_NAME == "windows" ]]; then
+      export BUILD_HOME=$TRAVIS_BUILD_DIR/cbuild/install;
+      export PATH=$BUILD_HOME/bin:$PATH;
     fi
 
   - if [[ $TRAVIS_OS_NAME == "linux" ]]; then
@@ -65,24 +68,15 @@ before_install:
     else
       export FILE_TAIL="tgz";
     fi
-  - ls -R cbuild
   - export FILE_NAME=$FILE_ROOT-$TRAVIS_OS_NAME-$TRAVIS_BRANCH.$FILE_TAIL
 
   # Make binaries for the library as appropriate
   - if [[ $BUILD == "True" && $TRAVIS_OS_NAME == "windows" ]]; then
-      which protoc.exe;
-      ./cbuild/install/bin/protoc.exe --version;      
-      protoc.exe --version;
-      echo $PATH;
       cd cmake && cmake -G "Visual Studio 15 2017 Win64" .. ;
       cmake --build . --config Release;
       cmake --build . --config Release --target install;
       cd ..;
     elif [[ $BUILD == "True" && ( $TRAVIS_OS_NAME == "linux" || $TRAVIS_OS_NAME == "osx" ) ]]; then
-      which protoc;
-      ./cbuild/install/bin/protoc --version;
-      protoc --version;
-      echo $PATH;      
       cd cmake && cmake .. -DCMAKE_BUILD_TYPE=Release && make install && cd .. ;
     fi
 
