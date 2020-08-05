@@ -96,7 +96,8 @@ script:
 
 deploy:
   provider: releases
-  token: "$GITHUB_APIKEY"
+  api_key:
+    secure: OqMvwj1FgJPcONTWgkARaYRbaNjs5cwBdqlT+T3nh7zdJR1gTE9kQZ9U40jGgj1kf6473E//ggO18Lvs2ZeEY6yiCsGBnc4YIsbWvQ6M7jIOtvxwUqYVig5SVCJPXd0CYHsvqhnWjSqJpD+VqzXwG3kWTgFYXXO7znC4SU5sfjDVJULImhxPSq0TsJWnytxy7nVw5nmagqcYOO1gQY3zRjdswtF3FqSjzrFMhkdk6T93So8ANqo/Hgk9iR1QqCtQATnPyDuHW0ECOtn6ja2O2YfCDUpbE3G5o/lmc0L8cRomwzGV+Q8cztS7IHKCdYcuetAL4HR4W90rQY6gx+0aHcu8nPxVCXi3eIn94p1KEOiyJY8Y1zatDYBCgolneg7/gBTaR1U8GQwz2ArO9O4PhL65nZ54MzoETjQb5QANM3wDSrJQllilSbkN/8ghqi1aHrIXSomM2WzyyTFj9j6Op+8QLrpIzeyBnsVZjBgNPRXvoGd0uGyBn5r0mfLZuMll+rrbklHTAIKmajdDQNYqvKETMBVew0cmBlwkbySprcsMbZZYBsJSK6OJoO5nWZFrAzoDyNunYX4oKYoIPXra7H8Z/Ke3oPOzacpqu5uysGXhi0XF+kFURUxe2CGayE3rcZlHVm5x8T2mdrG3R5FXNsDJC/5DetZNWoxZoG7s8Kc=
   file: "$FILE_NAME"
   on:
     tags: true
