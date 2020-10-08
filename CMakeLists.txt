@@ -20,7 +20,7 @@ include_directories (
 )
 
 find_library(LIBRDKAFKA
-    NAMES rdkafka
+    NAMES librdkafka rdkafka
     HINTS # Don't quote these in case BUILD_HOME is already quoted
     $ENV{BUILD_HOME}/lib # Absolute
     ${CMAKE_BINARY_DIR}/$ENV{BUILD_HOME}/lib # Relative
