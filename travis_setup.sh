@@ -21,7 +21,6 @@ elif [ "$TRAVIS_OS_NAME" == "windows" ]; then
   cp librdkafka.redist.1.4.4/build/native/lib/win/x64/win-x64-Release/v120/* cbuild/lib
   mkdir cbuild/include
   cp -r librdkafka.redist.1.4.4/build/native/include ./cbuild
-  find cbuild
 else
   echo "$TRAVIS_OS_NAME is currently not supported"  
 fi
