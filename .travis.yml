@@ -14,8 +14,8 @@ os: linux
 dist: xenial
 
 before_install:
-  - export FILE_ROOT="kdbkafka"
-  - export TESTS="False"
+  - export FILE_ROOT="protobufkdb"
+  - export TESTS="True"
   - export BUILD="True"
 
   # Run instructions to install the C/C++ requirements (BUILD_HOME) set in place of PAHO_HOME/HDF5_HOME etc.
@@ -23,11 +23,16 @@ before_install:
   - if [[ $BUILD == "True" ]]; then
       chmod +x travis_setup.sh; 
       ./travis_setup.sh;
-      export BUILD_HOME=$TRAVIS_BUILD_DIR/cbuild
       export LIB="cmake/$FILE_ROOT/lib";
       mkdir cmake;
     else
       export LIB="";
+    fi
+    
+  # On Windows, make sure protoc.exe is on the path so the cmake functionality to locate the protobuf installation works    
+  - if [[ $BUILD == "True" && $TRAVIS_OS_NAME == "windows" ]]; then
+      export BUILD_HOME=$TRAVIS_BUILD_DIR/cbuild/install;
+      export PATH=$BUILD_HOME/bin:$PATH;
     fi
 
   - if [[ $TRAVIS_OS_NAME == "linux" ]]; then
@@ -50,7 +55,7 @@ before_install:
       export LD_LIBRARY_PATH=$BUILD_HOME/lib:$LD_LIBRARY_PATH;
       export DYLD_LIBRARY_PATH=$BUILD_HOME/lib:$LD_LIBRARY_PATH;
       export PATH=$BUILD_HOME/lib:$PATH;
-      curl -o qhome/q.zip -L $OD;
+      curl -u $NEXUS_USER:$NEXUS_PASS -o qhome/q.zip -L $OD;
       unzip -d qhome qhome/q.zip;
       rm qhome/q.zip;
       echo -n $QLIC_KC |base64 --decode > qhome/kc.lic;
@@ -68,9 +73,8 @@ before_install:
   # Make binaries for the library as appropriate
   - if [[ $BUILD == "True" && $TRAVIS_OS_NAME == "windows" ]]; then
       cd cmake && cmake -G "Visual Studio 15 2017 Win64" .. ;
-      export MSBUILD_PATH="/c/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools/MSBuild/15.0/Bin/";
-      export PATH=$MSBUILD_PATH:$PATH;
-      MSBuild.exe INSTALL.vcxproj //m //nologo //verbosity:normal //p:Configuration=Release //p:Platform=x64;
+      cmake --build . --config Release;
+      cmake --build . --config Release --target install;
       cd ..;
     elif [[ $BUILD == "True" && ( $TRAVIS_OS_NAME == "linux" || $TRAVIS_OS_NAME == "osx" ) ]]; then
       cd cmake && cmake .. -DCMAKE_BUILD_TYPE=Release && make install && cd .. ;
@@ -78,6 +82,7 @@ before_install:
 
 script:
   - if [[ $TESTS == "True" && "x$OD" != "x" && "x$QLIC_KC" != "x" ]]; then
+      curl -o test.q -L https://github.com/KxSystems/hdf5/raw/master/test.q;
       q test.q tests/ -q;
     fi
   - if [[ $TRAVIS_OS_NAME == "windows" && $BUILD == "True" ]]; then
@@ -85,9 +90,9 @@ script:
     elif [[ $BUILD == "True" && ( $TRAVIS_OS_NAME == "linux" || $TRAVIS_OS_NAME == "osx" ) ]]; then  
       tar  -zcvf $FILE_NAME -C cmake/$FILE_ROOT .;
     elif [[ $TRAVIS_OS_NAME == "windows" ]]; then
-      7z a -tzip $FILE_NAME README.md install.bat LICENSE q examples;
+      7z a -tzip $FILE_NAME README.md install.bat LICENSE q examples proto;
     elif [[ $TRAVIS_OS_NAME == "linux" || $TRAVIS_OS_NAME == "osx" ]]; then
-      tar  -zcvf $FILE_NAME README.md install.sh LICENSE q examples;
+      tar  -zcvf $FILE_NAME README.md install.sh LICENSE q examples proto;
     fi
 
 deploy:
@@ -97,4 +102,5 @@ deploy:
   on:
     tags: true
     condition: $TRAVIS_OS_NAME = windows || $TRAVIS_OS_NAME = osx || ($TRAVIS_DIST = trusty && $TRAVIS_OS_NAME = linux) 
-  skip_cleanup: 'true' #  prevent Travis CI from resetting your working directory and deleting all changes made during the build 
+  skip_cleanup: 'true'
+  

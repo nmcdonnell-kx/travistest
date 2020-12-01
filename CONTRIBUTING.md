@@ -2,11 +2,11 @@
 
 Thanks for choosing to contribute to this project.
 
-If you haven't already, please view the [README](README.md) for an introduction to the aims and intended use of this project. 
+If you haven't already, please view the [README](README.md) for an introduction to the aims and intended use of this project.
 
 ## Contributing as a user (non-development)
 
-As a non-developer, you can still contribute in many ways. We are especially interested in hearing from people using the project in production/working environments.
+As a non-developer, you can still contribute in many ways. We are especially interesting in hearing from people using the project in production/working environments.
 
 If you spot any problems, please raise an issue within the project and provide as much information as possible. This should enable us to recreate the issue and check that any fix is appropriate.
 
@@ -42,6 +42,11 @@ In order to have your pull request approved in a timely manner, please provide c
 
 ### Additional Resources
 
-[Kx Kafka Documentation](https://code.kx.com/q/interfaces/kafka/)
-[librdkafka C Documentation](https://docs.confluent.io/2.0.0/clients/librdkafka/rdkafka_8h.html#ab66a2c014db2e652aa12466b137a6200)
+[Language Guide (proto3)](https://developers.google.com/protocol-buffers/docs/proto3)
+
+[Protocol Buffer Basics: C++](https://developers.google.com/protocol-buffers/docs/cpptutorial)
+
+[Protocol Buffers C++ Reference](https://developers.google.com/protocol-buffers/docs/reference/cpp)
+
+[KDB+ and q documentation](https://code.kx.com/q/)
 
