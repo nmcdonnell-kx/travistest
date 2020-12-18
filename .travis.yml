@@ -23,16 +23,11 @@ before_install:
   - if [[ $BUILD == "True" ]]; then
       chmod +x travis_setup.sh; 
       ./travis_setup.sh;
+      export BUILD_HOME=$TRAVIS_BUILD_DIR/cbuild/install;
       export LIB="cmake/$FILE_ROOT/lib";
       mkdir cmake;
     else
       export LIB="";
-    fi
-    
-  # On Windows, make sure protoc.exe is on the path so the cmake functionality to locate the protobuf installation works    
-  - if [[ $BUILD == "True" && $TRAVIS_OS_NAME == "windows" ]]; then
-      export BUILD_HOME=$TRAVIS_BUILD_DIR/cbuild/install;
-      export PATH=$BUILD_HOME/bin:$PATH;
     fi
 
   - if [[ $TRAVIS_OS_NAME == "linux" ]]; then
@@ -72,18 +67,22 @@ before_install:
 
   # Make binaries for the library as appropriate
   - if [[ $BUILD == "True" && $TRAVIS_OS_NAME == "windows" ]]; then
-      cd cmake && cmake -G "Visual Studio 15 2017 Win64" .. ;
+      cd cmake && cmake -G "Visual Studio 15 2017 Win64" -DCMAKE_PREFIX_PATH=$BUILD_HOME .. ;
       cmake --build . --config Release;
       cmake --build . --config Release --target install;
       cd ..;
     elif [[ $BUILD == "True" && ( $TRAVIS_OS_NAME == "linux" || $TRAVIS_OS_NAME == "osx" ) ]]; then
-      cd cmake && cmake .. -DCMAKE_BUILD_TYPE=Release && make install && cd .. ;
+      cd cmake && cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$BUILD_HOME && make install && cd .. ;
     fi
 
 script:
   - if [[ $TESTS == "True" && "x$OD" != "x" && "x$QLIC_KC" != "x" ]]; then
+      # The tests neeed to be run from the package directory since they
+      # need to dynamically import Google's .proto files
+      cd ./cmake/$FILE_ROOT;
       curl -o test.q -L https://github.com/KxSystems/hdf5/raw/master/test.q;
       q test.q tests/ -q;
+      cd ~;
     fi
   - if [[ $TRAVIS_OS_NAME == "windows" && $BUILD == "True" ]]; then
       7z a -tzip -r $FILE_NAME ./cmake/$FILE_ROOT/*;
