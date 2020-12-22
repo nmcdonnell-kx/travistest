@@ -38,14 +38,15 @@ before_install:
       ./vcpkg/bootstrap-vcpkg.sh;
     fi
     
+  # Use vcpkg to build and install protobuf for the required OS
   - if [[ $TRAVIS_OS_NAME == "linux" ]]; then
-      ./vcpkg/vcpkg install protobuf protobuf:x64-linux;
+      ./vcpkg/vcpkg install protobuf:x64-linux-rel;
       QLIBDIR=l64; OD=$L64;
     elif [[ $TRAVIS_OS_NAME == "osx" ]]; then
-      ./vcpkg/vcpkg install protobuf protobuf:x64-osx;
+      ./vcpkg/vcpkg install protobuf:x64-osx-rel;
       QLIBDIR=m64; OD=$M64;
     elif [[ $TRAVIS_OS_NAME == "windows" ]]; then
-      ./vcpkg/vcpkg.exe install protobuf protobuf:x64-windows-static;
+      ./vcpkg/vcpkg.exe install protobuf:x64-windows-static;
       QLIBDIR=w64; OD=$W64;
     else
       echo "unknown OS ('$TRAVIS_OS_NAME')" >&2; exit 1;
@@ -77,6 +78,8 @@ before_install:
   - export FILE_NAME=$FILE_ROOT-$TRAVIS_OS_NAME-$TRAVIS_BRANCH.$FILE_TAIL
 
   # Make binaries for the library as appropriate
+  
+  # Use vckpg toolchain to find protobuf
   - if [[ $BUILD == "True" && $TRAVIS_OS_NAME == "windows" ]]; then
       cd cmake && cmake -G "Visual Studio 15 2017 Win64" -DCMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake .. ;
       cmake --build . --config Release;
