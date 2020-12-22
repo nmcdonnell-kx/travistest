@@ -30,11 +30,22 @@ before_install:
       export LIB="";
     fi
 
+  # Download vcpkg
+  - git clone https://github.com/microsoft/vcpkg
+  - if [[ $TRAVIS_OS_NAME == "windows" ]]; then
+      ./vcpkg/bootstrap-vcpkg.bat;
+    else
+      ./vcpkg/bootstrap-vcpkg.sh;
+    fi
+    
   - if [[ $TRAVIS_OS_NAME == "linux" ]]; then
+      ./vcpkg/vcpkg install protobuf protobuf:x64-linux
       QLIBDIR=l64; OD=$L64;
     elif [[ $TRAVIS_OS_NAME == "osx" ]]; then
+      ./vcpkg/vcpkg install protobuf protobuf:x64-osx
       QLIBDIR=m64; OD=$M64;
     elif [[ $TRAVIS_OS_NAME == "windows" ]]; then
+      ./vcpkg/vcpkg.exe install protobuf protobuf:x64-windows-static
       QLIBDIR=w64; OD=$W64;
     else
       echo "unknown OS ('$TRAVIS_OS_NAME')" >&2; exit 1;
@@ -67,12 +78,12 @@ before_install:
 
   # Make binaries for the library as appropriate
   - if [[ $BUILD == "True" && $TRAVIS_OS_NAME == "windows" ]]; then
-      cd cmake && cmake -G "Visual Studio 15 2017 Win64" -DCMAKE_PREFIX_PATH=$BUILD_HOME .. ;
+      cd cmake && cmake -G "Visual Studio 15 2017 Win64" -DCMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake .. ;
       cmake --build . --config Release;
       cmake --build . --config Release --target install;
       cd ..;
     elif [[ $BUILD == "True" && ( $TRAVIS_OS_NAME == "linux" || $TRAVIS_OS_NAME == "osx" ) ]]; then
-      cd cmake && cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$BUILD_HOME && make install && cd .. ;
+      cd cmake && cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake && make install && cd .. ;
     fi
 
 script:
